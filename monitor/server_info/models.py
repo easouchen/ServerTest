@@ -12,10 +12,20 @@ monitored_type_choice = (
     )
 
 
+# 服务器的应用类型
+class AppTypes(models.Model):
+    name = models.CharField(max_length=200, help_text='应用名称')
+    description = models.CharField(max_length=250, help_text='应用描述')
+    parent = models.ForeignKey('self', related_name='son_app', help_text='父类型')
+    level_code = models.CharField(max_length=2, help_text='层级', default=1)
+    is_active = models.CharField(max_length=1, help_text='是否启用', default=1)
+
+
 # 基本信息表
 class ServerInfo(models.Model):
-    server_id = models.CharField(max_length=100, help_text='服务器标志')
     name = models.CharField(max_length=100, help_text='服务器名称')
+    description = models.CharField(max_length=250, help_text='服务器描述', default=None, null=True)
+    app_type = models.ManyToManyField(AppTypes, related_name='my_apps', default=None, null=True)
     system_type = models.CharField(max_length=100, default='linux')
     # 0 不监控，1 监控
     is_active = models.CharField(max_length=2, help_text='是否监控', default=1)
@@ -34,7 +44,7 @@ class ServerRights(models.Model):
 
 # 每账号对应的服务器权限
 class ServerAdmin(models.Model):
-    server = models.ForeignKey(ServerInfo, related_name='my_user')
+    server = models.ManyToManyField(ServerInfo, related_name='my_user')
     user = models.CharField(max_length=100, help_text='登录账户')
     rights = models.ManyToManyField(ServerRights, related_name='my_rights')
 
