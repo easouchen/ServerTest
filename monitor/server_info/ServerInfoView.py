@@ -10,18 +10,20 @@ from django.utils.timezone import now
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from server_info.models import ServerInfo, AppTypes
+from utils.share_view import ShareView
 
 
 # 服务器应用类型
-class ServerAppView(APIView):
+class ServerAppView(ShareView):
     def get(self, request):
         rd = {'error_code': '200', 'error_message': '请求成功'}
         data = AppTypes.objects.all().values("name", "parent_id", "parent__name","is_active", "description")
         rd['results'] = data
         return Response(rd)
 
-    def post(self, request):
-        rd = {'error_code': '200', 'error_message': '请求成功'}
+    def get_model(self):
+        model = AppTypes
+        return model
 
 
 
